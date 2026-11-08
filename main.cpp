@@ -36,6 +36,12 @@ public:
 	float mass = 0.43f; // mass of the ball in kg, not used in this program but could be used for future calculations
 	float radius = 0.11f; // radius of the ball in meters, not used in this program but could be used for future calculations (matches weight to a standard soccer ball)
 	float area = 0.038f; // area of a standard soccer ball calculated with pi * r^2, not used in this program but could be used for future calculations
+	float restitution = 0.8f; // coefficient of restitution for a standard soccer ball, not used in this program but could be used for future calculations
+	float frictionCoefficient = 0.5f; // coefficient of friction for a standard soccer ball, not used in this program but could be used for future calculations
+	float stiffness = 1000.0f; // stiffness of a standard soccer ball, not used in this program but could be used for future calculations
+	float floorLevel = 0.0f; // z level of the floor, not used in this program but could be used for future calculations
+	float compression = 0.0f; // compression of the ball, not used in this program but could be used for future calculations
+	float springforce = 0.0f;
 
 	void inputSphereInfo(float vec3[3])
 	{
@@ -54,6 +60,12 @@ public:
 		std::cin >> xspeedbase;
 		std::cout << "Will the ball be traveling left or right (l = left r = right): ";
 		std::cin >> xdirection;
+		std::cout << "Enter the Floor Level (z axis): ";
+		std::cin >> floorLevel;
+		std::cout << "Enter the Stiffness: ";
+		std::cin >> stiffness;
+		std::cout << "Enter the Friction: ";
+		std::cin >> frictionCoefficient;
 
 		// set the y speeds based on the direction input
 		if (ydirection == 'f')
@@ -94,14 +106,35 @@ public:
 
 	void logSphereInfo(float timePassed, float gravity, float dt)
 	{
-		currentAcceleration = gravity - (dragForce / mass);
 		dragForce = 0.5f * airDensity * dragCoefficient * area * (zspeed * zspeed);
+		compression = ballZ - (floorLevel - radius);
+
+		if (compression < 0.0f) {
+			compression = 0.0f;
+		}
+
+		springforce = stiffness * compression;
+		currentAcceleration = gravity - (dragForce / mass) - (springforce / mass);
 		zspeed = zspeed + (currentAcceleration * dt);
+
+		if (compression > 0.0f) {
+			xspeed = xspeed - (frictionCoefficient * gravity * dt);
+			yspeed = yspeed - (frictionCoefficient * gravity * dt);
+		}
 		// update the ball's position based on the current speed and time passed
-		ballX = vec3[0] * timePassed;
-		ballY = vec3[1] * timePassed;
+		ballX = ballX + (xspeed * dt);
+		ballY = ballY + (yspeed * dt);
 		ballZ = ballZ + (zspeed * dt);
-		std::cout << "Time: " << timePassed << "s, Ball Position: ( X: " << ballX << ", Y: " << ballY << ", Z: " << ballZ << ")" << std::endl;
+
+		std::cout << "Time: " << timePassed << "s, Ball Position: ( X: " << ballX << ", Y: " << ballY << ", Z: " << ballZ << ") | Speeds: (X: " << xspeed << ", Y: " << yspeed << ", Z: " << zspeed << ") | Compression: " << compression << '\n';
+	}
+
+	void dectectFloor()
+	{
+		if (ballZ >= floorLevel - radius)
+		{
+			zspeed = -zspeed * restitution; // reverse the z speed and apply the coefficient of restitution
+		}
 	}
 };
 
@@ -215,20 +248,20 @@ int main()
 	float dt = 0.00606f; // time step in seconds, im so happy im finally getting proffesional! (this is from ue5, inter alia)
 	float timePassed = 0.0f;
 
-	//sphere_mesh sphere;
-	//sphere.inputSphereInfo(sphere.vec3);
-	cube_mesh cube;
-	cube.inputCubeInfo(cube.vec3);
+	sphere_mesh sphere;
+	sphere.inputSphereInfo(sphere.vec3);
+	//cube_mesh cube;
+	//cube.inputCubeInfo(cube.vec3);
 
 	while (1)
 	{
-		//sphere.logSphereInfo(timePassed, gravity, dt);
+		sphere.logSphereInfo(timePassed, gravity, dt);
 
-		cube.logCubeInfo(timePassed, gravity, dt);
+		//cube.logCubeInfo(timePassed, gravity, dt);
 
 		timePassed += dt;
 
-		if (timePassed > 10.0f) { break;}
+		if (timePassed > 5.0f) { break;}
 
 	}
 	std::cin.get(); // wait for user input before closing the console window
