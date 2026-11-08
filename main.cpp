@@ -42,6 +42,13 @@ public:
 	float floorLevel = 0.0f; // z level of the floor, not used in this program but could be used for future calculations
 	float compression = 0.0f; // compression of the ball, not used in this program but could be used for future calculations
 	float springforce = 0.0f;
+	// rotation variables
+	float pitch = 0.0f;
+	float pitchSpeed = 0.0f;
+	float yaw = 0.0f;
+	float yawSpeed = 0.0f;
+	float roll = 0.0f;
+	float rollSpeed = 0.0f;
 
 	void inputSphereInfo(float vec3[3])
 	{
@@ -120,13 +127,22 @@ public:
 		if (compression > 0.0f) {
 			xspeed = xspeed - (frictionCoefficient * gravity * dt);
 			yspeed = yspeed - (frictionCoefficient * gravity * dt);
+
+			// only slows the spin down when touching the floor!
+			pitchSpeed = pitchSpeed - (frictionCoefficient * gravity * dt);
+			rollSpeed = rollSpeed - (frictionCoefficient * gravity * dt);
 		}
-		// update the ball's position based on the current speed and time passed
+		// Update the cube's position based on the current speed and time passed
 		ballX = ballX + (xspeed * dt);
 		ballY = ballY + (yspeed * dt);
 		ballZ = ballZ + (zspeed * dt);
 
-		std::cout << "Time: " << timePassed << "s, Ball Position: ( X: " << ballX << ", Y: " << ballY << ", Z: " << ballZ << ") | Speeds: (X: " << xspeed << ", Y: " << yspeed << ", Z: " << zspeed << ") | Compression: " << compression << '\n';
+		// Update the cube's rotation angles based on the current spin speeds
+		pitch = pitch + (pitchSpeed * dt);
+		yaw = yaw + (yawSpeed * dt);
+		roll = roll + (rollSpeed * dt);
+
+		std::cout << "Time: " << timePassed << "s, Ball Position: ( X: " << ballX << ", Y: " << ballY << ", Z: " << ballZ << ") | Speeds: (X: " << xspeed << ", Y: " << yspeed << ", Z: " << zspeed << ") | Compression: " << compression << " | Rotation: (X: " << pitch << ", Y: " << yaw << ", Z: " << ")\n";
 	}
 
 	void dectectFloor()
@@ -168,9 +184,23 @@ public:
 	float xspeedbase;
 	char xdirection;
 	// weight and size variables
-	float mass = 0.43f;
-	float sidelength = 0.11f;
-	float area = 0.038f; 
+	float mass = 0.43f; // mass of the ball in kg, not used in this program but could be used for future calculations
+	float sidelength = 0.11f; // radius of the ball in meters, not used in this program but could be used for future calculations (matches weight to a standard soccer ball)
+	float area = 0.038f; // area of a standard soccer ball calculated with pi * r^2, not used in this program but could be used for future calculations
+	float restitution = 0.8f; // coefficient of restitution for a standard soccer ball, not used in this program but could be used for future calculations
+	float frictionCoefficient = 0.5f; // coefficient of friction for a standard soccer ball, not used in this program but could be used for future calculations
+	float stiffness = 1000.0f; // stiffness of a standard soccer ball, not used in this program but could be used for future calculations
+	float floorLevel = 0.0f; // z level of the floor, not used in this program but could be used for future calculations
+	float compression = 0.0f; // compression of the ball, not used in this program but could be used for future calculations
+	float springforce = 0.0f;
+
+	// rotation variables
+	float pitch = 0.0f;
+	float pitchSpeed = 0.0f;
+	float yaw = 0.0f;
+	float yawSpeed = 0.0f;
+	float roll = 0.0f;
+	float rollSpeed = 0.0f;
 
 	void inputCubeInfo(float vec3[3])
 	{
@@ -189,6 +219,12 @@ public:
 		std::cin >> xspeedbase;
 		std::cout << "Will the cube be traveling left or right (l = left r = right): ";
 		std::cin >> xdirection;
+		std::cout << "Enter the Floor Level (z axis): ";
+		std::cin >> floorLevel;
+		std::cout << "Enter the Stiffness: ";
+		std::cin >> stiffness;
+		std::cout << "Enter the Friction: ";
+		std::cin >> frictionCoefficient;
 
 		// set the y speeds based on the direction input
 		if (ydirection == 'f')
@@ -229,16 +265,49 @@ public:
 
 	void logCubeInfo(float timePassed, float gravity, float dt)
 	{
-		currentAcceleration = gravity - (dragForce / mass);
 		dragForce = 0.5f * airDensity * dragCoefficient * area * (zspeed * zspeed);
+		compression = cubeZ - (floorLevel - (sidelength * 0.5f));
+
+		if (compression < 0.0f) {
+			compression = 0.0f;
+		}
+
+		springforce = stiffness * compression;
+		currentAcceleration = gravity - (dragForce / mass) - (springforce / mass);
 		zspeed = zspeed + (currentAcceleration * dt);
-		// update the cube's position based on the current speed and time passed
-		cubeX = vec3[0] * timePassed;
-		cubeY = vec3[1] * timePassed;
+
+		if (compression > 0.0f) {
+			xspeed = xspeed - (frictionCoefficient * gravity * dt);
+			yspeed = yspeed - (frictionCoefficient * gravity * dt);
+
+			// only slows the spin down when touching the floor!
+			pitchSpeed = pitchSpeed - (frictionCoefficient * gravity * dt);
+			rollSpeed = rollSpeed - (frictionCoefficient * gravity * dt);
+		}
+
+		// Update the cube's position based on the current speed and time passed
+		cubeX = cubeX + (xspeed * dt);
+		cubeY = cubeY + (yspeed * dt);
 		cubeZ = cubeZ + (zspeed * dt);
-		std::cout << "Time: " << timePassed << "s, Cube's Position: ( X: " << cubeX << ", Y: " << cubeY << ", Z: " << cubeZ << ")" << std::endl;
+
+		// Update the cube's rotation angles based on the current spin speeds
+		pitch = pitch + (pitchSpeed * dt);
+		yaw = yaw + (yawSpeed * dt);
+		roll = roll + (rollSpeed * dt);
+
+		std::cout << "Time: " << timePassed << "s, Cube's Position: ( X: " << cubeX << ", Y: " << cubeY << ", Z: " << cubeZ << ") | Speeds: (X: " << xspeed << ", Y: " << yspeed << ", Z: " << zspeed << ") | Compression: " << compression << " | Rotation: (X: " << pitch << ", Y: " << yaw << ", Z: " << roll << ")\n";
+	}
+
+
+	void dectectFloor()
+	{
+		if (cubeZ >= floorLevel - (sidelength * 0.5f))
+		{
+			zspeed = -zspeed * restitution; // reverse the z speed and apply the coefficient of restitution
+		}
 	}
 };
+
 
 
 int main()
