@@ -2,6 +2,7 @@
 // the day is 11/8/2026 and i know this program is gonna fuck me in the brain
 // this is 11/8/2026 still?! and i was right lol
 // sorry for swearing
+// btw i finished with the project this was a small fun project to relax for a day :)
 
 
 class sphere_mesh
