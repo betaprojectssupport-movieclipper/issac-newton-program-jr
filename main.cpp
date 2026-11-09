@@ -324,7 +324,7 @@ int main()
 	//cube_mesh cube;
 	//cube.inputCubeInfo(cube.vec3);
 
-	while (1)
+	while (true)
 	{
 		sphere.logSphereInfo(timePassed, gravity, dt);
 
@@ -337,3 +337,4 @@ int main()
 	}
 	std::cin.get(); // wait for user input before closing the console window
 }
+
