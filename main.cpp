@@ -77,34 +77,24 @@ public:
 		std::cin >> frictionCoefficient;
 
 		// set the y speeds based on the direction input
-		if (ydirection == 'f')
-		{
-			yspeed = yspeedbase;
+		// way cleaner and simpler
+		if (ydirection != 'f' && ydirection != 'b') {
+		    std::cout << "Invalid input for y direction. Aborting Program." << std::endl;
+		    exit(0);
 		}
-		else if (ydirection == 'b')
-		{
-			yspeed = -(yspeedbase);
-		}
-		else
-		{
-			std::cout << "Invalid input for y direction. Aborting Program." << std::endl;
-			exit(0);
-		}
+		
+		yspeed = (ydirection == 'f') ? yspeedbase : -yspeedbase;
 
 		// set the x speeds based on the direction input
-		if (xdirection == 'r')
-		{
-			xspeed = xspeedbase;
-		}
-		else if (xdirection == 'l')
-		{
-			xspeed = -(xspeedbase);
-		}
-		else
+
+		// same goes here again
+		if (xdirection != 'f' && xdirection != 'l')
 		{
 			std::cout << "Invalid input for x direction. Aborting Program." << std::endl;
 			exit(0); 
 		}
+
+		xdirection = (xdirection == f) ? xdirection : -xdirection;
 
 		vec3[0] = xspeed;
 		vec3[1] = yspeed;
@@ -229,34 +219,24 @@ public:
 		std::cin >> frictionCoefficient;
 
 		// set the y speeds based on the direction input
-		if (ydirection == 'f')
-		{
-			yspeed = yspeedbase;
+		// way cleaner and simpler
+		if (ydirection != 'f' && ydirection != 'b') {
+		    std::cout << "Invalid input for y direction. Aborting Program." << std::endl;
+		    exit(0);
 		}
-		else if (ydirection == 'b')
-		{
-			yspeed = -(yspeedbase);
-		}
-		else
-		{
-			std::cout << "Invalid input for y direction. Aborting Program." << std::endl;
-			exit(0);
-		}
+		
+		yspeed = (ydirection == 'f') ? yspeedbase : -yspeedbase;
 
 		// set the x speeds based on the direction input
-		if (xdirection == 'r')
-		{
-			xspeed = xspeedbase;
-		}
-		else if (xdirection == 'l')
-		{
-			xspeed = -(xspeedbase);
-		}
-		else
+
+		// same goes here again
+		if (xdirection != 'f' && xdirection != 'l')
 		{
 			std::cout << "Invalid input for x direction. Aborting Program." << std::endl;
-			exit(0);
+			exit(0); 
 		}
+
+		xdirection = (xdirection == f) ? xdirection : -xdirection;
 
 		vec3[0] = xspeed;
 		vec3[1] = yspeed;
